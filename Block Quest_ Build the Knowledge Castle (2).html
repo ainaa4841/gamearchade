@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Block Quest: Build the Knowledge Castle</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#d9f2d0;--card:#fff;--ink:#1d2b1a;--acc:#3f9b2f;--math:#8a8f98;--words:#a9713a;--sci:#35b6e6;--bad:#d64545;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12200f;--card:#1e301b;--ink:#eaf5e4;--acc:#6fcf5a}}
+:root[data-theme="dark"]{--bg:#12200f;--card:#1e301b;--ink:#eaf5e4;--acc:#6fcf5a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Fredoka","Trebuchet MS",Verdana,sans-serif;font-size:17px;line-height:1.5;min-height:100vh;display:flex;justify-content:center}
+#app{width:100%;max-width:560px;padding:14px}
+h1{font-size:32px;line-height:1.2;text-align:center;margin:10px 0}
+.card{background:var(--card);border:4px solid var(--ink);padding:14px;margin:10px 0;box-shadow:5px 5px 0 var(--ink)}
+button{font:inherit;font-weight:600;color:inherit;cursor:pointer;border:4px solid var(--ink);background:var(--card);padding:10px;box-shadow:3px 3px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:none}
+button.on{background:var(--acc);color:#fff}
+.big{background:var(--acc);color:#fff;width:100%;font-size:22px;padding:14px}
+input{font:inherit;width:100%;padding:10px;border:4px solid var(--ink);background:var(--card);color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>button{flex:1;min-width:90px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.castle{display:flex;gap:6px;justify-content:center;font-size:22px;margin:6px 0}
+.castle span{opacity:.25;filter:grayscale(1)}.castle span.b{opacity:1;filter:none}
+.bar{height:16px;border:3px solid var(--ink);background:var(--card)}.bar i{display:block;height:100%;background:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.blk{aspect-ratio:1;font-size:26px;padding:0;color:#fff}
+.blk.math{background:var(--math)}.blk.words{background:var(--words)}.blk.science{background:var(--sci)}
+.blk.gone{visibility:hidden}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:14px;z-index:5}
+.ov .card{width:100%;max-width:520px;max-height:100%;overflow:auto}
+.q{font-size:26px;font-weight:600;margin:6px 0 14px;text-align:center;line-height:1.4}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opts button{font-size:21px;padding:14px 6px}
+.ok{background:var(--acc)!important;color:#fff}.no{background:var(--bad)!important;color:#fff}
+.msg{text-align:center;min-height:22px;margin-top:10px}
+small{font-size:14px;opacity:.85}
+body{background:linear-gradient(#6fd0ff 0%,#c4ecff 55%,#8fd45a 55.1%,#4fa832 100%) fixed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:linear-gradient(#171747,#3b2a6e 55%,#1f4d24 55.1%,#123016) fixed}}
+:root[data-theme="dark"] body{background:linear-gradient(#171747,#3b2a6e 55%,#1f4d24 55.1%,#123016) fixed}
+body::before{content:"☁️          ☁️      ☁️";position:fixed;top:5%;left:0;font-size:34px;white-space:nowrap;animation:drift 45s linear infinite;pointer-events:none;opacity:.85}
+@keyframes drift{from{transform:translateX(-100%)}to{transform:translateX(100vw)}}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes pop{0%{transform:scale(.2) rotate(-20deg)}60%{transform:scale(1.4) rotate(8deg)}100%{transform:scale(1)}}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes rb{to{background-position:200%}}
+.rainbow{background:linear-gradient(90deg,#ff4d4d,#ffb020,#ffe14d,#4ddc6a,#35b6e6,#9b6bff,#ff4d4d);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rb 4s linear infinite;filter:drop-shadow(3px 3px 0 var(--ink))}
+.blk{border-radius:4px;animation:bob 2.4s ease-in-out infinite;animation-delay:var(--d,0s);transition:transform .15s;text-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.blk:hover{animation:none;transform:scale(1.12) rotate(-4deg);z-index:1}
+.blk.math{background:radial-gradient(circle at 25% 25%,#d5d9e0 0 12%,transparent 13%),radial-gradient(circle at 70% 65%,#5f646d 0 14%,transparent 15%),linear-gradient(135deg,#9aa0aa,#6f7580)}
+.blk.words{background:repeating-linear-gradient(90deg,#c58a45 0 10px,#8f5f2b 10px 12px)}
+.blk.science{background:linear-gradient(135deg,#7df0ff,#2aa9e0 50%,#a98bff);box-shadow:3px 3px 0 var(--ink),inset 0 0 14px #fff9}
+.opts button{color:#1d2b1a;transition:transform .12s}.opts button:hover{transform:scale(1.04)}
+.opts button:nth-child(1){background:#ff8a80}.opts button:nth-child(2){background:#ffd54f}.opts button:nth-child(3){background:#81d4fa}.opts button:nth-child(4){background:#a5d6a7}
+.ok,.no{color:#fff!important}
+.ov .card{animation:pop .3s}.shake{animation:shake .4s!important}
+.castle span.b{filter:drop-shadow(0 0 6px gold)}.castle span.pop{animation:pop .8s}
+.bar i{background:linear-gradient(90deg,#ffb020,#ff5e8a,#9b6bff);transition:width .4s}
+.streak{background:#ff7a1a;color:#fff;border:3px solid var(--ink);padding:2px 8px;animation:pop .4s}
+.av{font-size:22px}button.on{transform:scale(1.06)}
+.pt{position:fixed;pointer-events:none;z-index:9;font-size:20px;animation:fly .9s ease-out forwards}
+.cf{position:fixed;top:-20px;width:10px;height:14px;z-index:9;pointer-events:none;animation:fall 3s linear forwards}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gc{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 8px;color:#1d2b1a;animation:bob 3s ease-in-out infinite}
+.gc:nth-child(2n){animation-delay:.5s}.gc:hover{animation:none;transform:scale(1.05)}
+.gc span{font-size:46px}.gc b{font-size:20px}.gc small{font-size:14px;text-align:center}
+.mem{grid-template-columns:repeat(4,1fr)}
+.mc{aspect-ratio:1;font-size:28px;padding:2px;background:linear-gradient(135deg,#9b6bff,#35b6e6);color:#fff;overflow:hidden}
+.mc.up{background:#fff;color:#1d2b1a;animation:pop .3s}.mc.done{background:#6fcf5a;color:#1d2b1a}
+.slots{display:flex;gap:6px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.slot{min-width:38px;height:48px;border:4px solid var(--ink);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;text-transform:uppercase}
+#tl{justify-content:center}#tl button{flex:0 0 auto;min-width:48px;padding:10px 14px;font-size:26px;text-transform:uppercase;background:#ffd54f;color:#1d2b1a}#tl button:disabled{opacity:.3}
+.track{position:relative;height:44px;border-bottom:4px dashed var(--ink);font-size:32px;margin-top:8px}.rk{position:absolute;top:0}.mn{position:absolute;right:0;top:0}
+</style></head>
+<body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),R=n=>Math.floor(Math.random()*n);
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const SUB={math:{n:"Maths",i:"🪨"},words:{n:"Words",i:"🪵"},science:{n:"Science",i:"💎"}};
+const LV=["Year 1–2","Year 3–4","Year 5–6"];
+const PARTS=["🧱","🚪","🗼","🪟","🚩","👑"],COST=4;
+const WORDS=[
+[["apple","🍎"],["cat","🐱"],["fish","🐟"],["sun","☀️"],["book","📚"],["tree","🌳"],["car","🚗"],["star","⭐"]],
+[["banana","🍌"],["rabbit","🐰"],["rocket","🚀"],["elephant","🐘"],["guitar","🎸"],["umbrella","☂️"],["butterfly","🦋"],["pizza","🍕"]],
+[["dinosaur","🦖"],["volcano","🌋"],["telescope","🔭"],["crocodile","🐊"],["rainbow","🌈"],["astronaut","🧑‍🚀"],["pineapple","🍍"],["helicopter","🚁"]]];
+const SCI=[
+[["Which animal says “moo”?","Cow","Cat","Duck"],["What do plants need to grow?","Water and sunlight","Candy","Plastic"],["Which one is a fruit?","Mango","Carrot","Rice"],["How many legs does a spider have?","8","6","4"],["Blue + yellow makes which colour?","Green","Purple","Orange"]],
+[["Which planet do we live on?","Earth","Mars","Jupiter"],["Which gas do we breathe in?","Oxygen","Helium","Smoke"],["Which one is a mammal?","Whale","Shark","Frog"],["Water freezes at…","0 °C","50 °C","100 °C"],["Which part of a plant takes in water?","Roots","Leaves","Flowers"]],
+[["How do plants make their food?","Photosynthesis","Digestion","Evaporation"],["Which force pulls things down?","Gravity","Magnetism","Friction"],["Which planet is the Red Planet?","Mars","Venus","Saturn"],["What is the closest star to Earth?","The Sun","The Moon","Polaris"],["Which material conducts electricity well?","Copper","Wood","Rubber"]]];
+
+function numOpts(a){const s=new Set([a]);while(s.size<4){const v=a+(R(2)?1:-1)*(R(9)+1);if(v>0)s.add(v)}return shuf([...s].map(String))}
+function qMath(t){let q,a;
+ if(t==0){const x=R(10)+1,y=R(10)+1;if(R(2)){q=`${x} + ${y} = ?`;a=x+y}else{q=`${Math.max(x,y)} − ${Math.min(x,y)} = ?`;a=Math.abs(x-y)}}
+ else if(t==1){const x=R(9)+2,y=R(9)+2;if(R(2)){q=`${x} × ${y} = ?`;a=x*y}else{q=`${x*y} ÷ ${x} = ?`;a=y}}
+ else{const k=R(3);if(k==0){const x=R(80)+20,y=R(8)+3;q=`${x} × ${y} = ?`;a=x*y}
+  else if(k==1){const d=[2,4,5][R(3)],m=R(8)+3;q=`1/${d} of ${d*m} = ?`;a=m}
+  else{const s=R(12)+3;q=`A square has sides of ${s} cm. What is its perimeter (cm)?`;a=4*s}}
+ return{q,a:String(a),o:numOpts(a)}}
+function miss(w){const V="aeiou";for(let n=0;n<30;n++){const i=1+R(w.length-2);let m;const k=R(4);
+ if(k==0)m=w.slice(0,i)+w.slice(i+1);else if(k==1)m=w.slice(0,i)+w[i+1]+w[i]+w.slice(i+2);
+ else if(k==2)m=w.slice(0,i)+w[i]+w.slice(i);else m=w.replace(/[aeiou]/,v=>V[(V.indexOf(v)+1+R(4))%5]);
+ if(m!==w)return m}return w+"e"}
+function qWords(t){const[w,e]=WORDS[t][R(WORDS[t].length)];const s=new Set([w]);while(s.size<3)s.add(miss(w));
+ return{q:`${e}<br>How do you spell this?`,a:w,o:shuf([...s])}}
+function qSci(t){const[q,a,...w]=SCI[t][R(SCI[t].length)];return{q,a,o:shuf([a,...w])}}
+const GEN={math:qMath,words:qWords,science:qSci};
+
+let S,mute=false,AC;
+function sfx(t){if(mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const seq={ok:[[523,.1],[659,.1],[784,.15]],no:[[220,.2],[165,.25]],build:[[392,.1],[523,.1],[659,.1],[1047,.3]],win:[[523,.12],[659,.12],[784,.12],[1047,.4]]}[t];let at=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type=t=="no"?"sawtooth":"square";o.frequency.value=f;g.gain.setValueAtTime(.08,at);g.gain.exponentialRampToValueAtTime(.001,at+d);o.connect(g);g.connect(AC.destination);o.start(at);o.stop(at+d);at+=d})}catch(e){}}
+function burst(r,em){if(!r)return;for(let k=0;k<12;k++){const p=document.createElement("div");p.className="pt";p.textContent=em[R(em.length)];p.style.left=r.left+r.width/2+"px";p.style.top=r.top+r.height/2+"px";const a=Math.random()*6.28,d=50+R(70);p.style.setProperty("--x",Math.cos(a)*d+"px");p.style.setProperty("--y",Math.sin(a)*d-30+"px");p.style.setProperty("--r",R(360)+"deg");document.body.appendChild(p);setTimeout(()=>p.remove(),900)}}
+function confetti(){const c=["#ff4d4d","#ffb020","#ffe14d","#4ddc6a","#35b6e6","#9b6bff"];for(let k=0;k<70;k++){const e=document.createElement("div");e.className="cf";e.style.left=R(100)+"vw";e.style.background=c[R(6)];e.style.animationDelay=Math.random()*1.5+"s";document.body.appendChild(e);setTimeout(()=>e.remove(),5000)}}
+function start(){
+ $("#app").innerHTML=`<h1 class="rainbow">⛏️ BLOCK QUEST ⛏️</h1><p style="text-align:center">Mine blocks. Answer to break them. Build the Knowledge Castle!</p>
+ <div class="card"><p>Your name</p><input id="nm" maxlength="12" placeholder="Steve?"></div>
+ <div class="card"><p>Pick your hero</p><div class="row" id="av">${["🧑‍🚀","🦸","🧙","🐱","🤖"].map((a,i)=>`<button class="${i==0?"on":""}" style="font-size:22px;min-width:50px">${a}</button>`).join("")}</div></div>
+ <div class="card"><p>Your level</p><div class="row" id="lv">${LV.map((l,i)=>`<button data-i="${i}" class="${i==T?"on":""}">${l}</button>`).join("")}</div></div>
+ <div class="card"><p>Blocks to mine</p><div class="row" id="sb">${Object.keys(SUB).map(k=>`<button data-k="${k}" class="on">${SUB[k].i} ${SUB[k].n}</button>`).join("")}</div></div>
+ <button class="big" id="go">▶ PLAY</button><button id="bk" style="width:100%;margin-top:10px">← Menu</button>`;
+ let tier=T,av="🧑‍🚀";
+ $("#av").onclick=e=>{const b=e.target.closest("button");if(!b)return;av=b.textContent;sfx("ok");[...$("#av").children].forEach(x=>x.classList.toggle("on",x===b))};
+ $("#lv").onclick=e=>{const b=e.target.closest("button");if(!b)return;tier=+b.dataset.i;[...$("#lv").children].forEach(x=>x.classList.toggle("on",x===b))};
+ $("#sb").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.classList.contains("on")&&document.querySelectorAll("#sb .on").length==1)return;b.classList.toggle("on")};
+ $("#bk").onclick=home;
+ $("#go").onclick=()=>{S={name:$("#nm").value.trim()||"Hero",av,streak:0,tier,subs:[...document.querySelectorAll("#sb .on")].map(b=>b.dataset.k),hearts:3,bag:0,castle:0,right:0,total:0,grid:[],busy:false};newWorld();play()};
+}
+function newWorld(){S.grid=Array.from({length:20},()=>S.subs[R(S.subs.length)])}
+function play(msg){
+ const left=S.grid.filter(Boolean).length;
+ $("#app").innerHTML=`<div class="top"><span><span class="av">${S.av}</span> ${S.name}</span>${S.streak>1?`<span class="streak">🔥 x${S.streak}</span>`:""}<button id="mt" style="padding:4px 8px">${mute?"🔇":"🔊"}</button><span>${"❤️".repeat(S.hearts)}${"🖤".repeat(3-S.hearts)}</span></div>
+ <div class="card"><div class="castle">${PARTS.map((p,i)=>`<span class="${i<S.castle?"b":""} ${i==S.castle-1&&S.fresh?"pop":""}">${p}</span>`).join("")}</div>
+ <div class="bar"><i style="width:${S.bag/COST*100}%"></i></div><small>Collect ${COST} blocks to build the next castle piece (${S.bag}/${COST})</small></div>
+ <div class="grid">${S.grid.map((g,i)=>`<button class="blk ${g||"gone"} ${g||""}" data-i="${i}" style="--d:${(i%7)*.3}s" aria-label="${g?SUB[g].n+" block":"mined"}">${g?SUB[g].i:""}</button>`).join("")}</div>
+ <p class="msg">${msg||"Tap a block to mine it!"}</p><p style="text-align:center"><small>${left} blocks left in this world</small></p>`;
+ $("#mt").onclick=()=>{mute=!mute;$("#mt").textContent=mute?"🔇":"🔊"};
+ document.querySelector(".grid").onclick=e=>{const b=e.target.closest(".blk");if(!b||S.busy)return;ask(+b.dataset.i)};
+}
+function ask(i){
+ const sub=S.grid[i];if(!sub)return;S.busy=true;const q=GEN[sub](S.tier);
+ const ov=document.createElement("div");ov.className="ov";
+ ov.innerHTML=`<div class="card"><small>${SUB[sub].i} ${SUB[sub].n} block</small><div class="q">${q.q}</div><div class="opts">${q.o.map(o=>`<button>${o}</button>`).join("")}</div><p class="msg" id="fb"></p></div>`;
+ document.body.appendChild(ov);
+ ov.querySelector(".opts").onclick=e=>{const b=e.target.closest("button");if(!b||ov.dataset.done)return;ov.dataset.done=1;
+  const ok=b.textContent===q.a;S.total++;
+  [...ov.querySelectorAll(".opts button")].forEach(x=>{if(x.textContent===q.a)x.classList.add("ok")});
+  if(ok){S.right++;S.streak++;sfx("ok");$("#fb").textContent=["⛏️ Great! Block mined!","🌟 Awesome!","🎉 Nailed it!","💪 Super miner!"][R(4)]}else{S.streak=0;sfx("no");ov.firstChild.classList.add("shake");b.classList.add("no");S.hearts--;$("#fb").textContent=`Oops! The answer is ${q.a}`}
+  setTimeout(()=>{ov.remove();S.busy=false;done(ok,i)},ok?700:1800)};
+}
+function done(ok,i){
+ let msg;
+ S.fresh=false;const r=document.querySelector(`.blk[data-i="${i}"]`)?.getBoundingClientRect(),em=SUB[S.grid[i]||"math"].i;
+ if(ok){S.grid[i]=null;S.bag++;msg="+1 block!";setTimeout(()=>burst(r,[em,"✨","⭐"]),30);
+  if(S.bag>=COST){S.bag=0;S.castle++;msg=`🏗️ You built a castle piece ${PARTS[S.castle-1]}!`;S.fresh=true;sfx("build");setTimeout(()=>burst(r,["🧱","🏰","✨"]),30);
+   if(S.castle>=PARTS.length)return win()}
+  if(!S.grid.some(Boolean)){newWorld();msg="🌍 A new world appeared!"}}
+ else if(S.hearts<=0){S.hearts=3;msg="😴 You rested at camp. Hearts restored. Try again!"}
+ else msg="Be careful, miner!";
+ play(msg);
+}
+function win(){
+ const pct=S.total?Math.round(S.right/S.total*100):0;
+ $("#app").innerHTML=`<h1 class="rainbow">🏰 CASTLE COMPLETE! 🏰</h1><div class="castle">${PARTS.join(" ")}</div>
+ <div class="card" style="text-align:center"><p>Amazing, ${S.name}!</p><p>You answered ${S.right} of ${S.total} questions right (${pct}%).</p><p>${pct>=80?"🏅 Master Builder":pct>=50?"🥈 Expert Miner":"🥉 Brave Explorer"}</p></div>
+ <button class="big" id="again">↻ PLAY AGAIN</button>`;
+ $("#again").onclick=home;sfx("win");confetti();
+}
+let T=0,TM;
+function head(t){return `<div class="top"><button id="bk" style="padding:6px 10px">← Menu</button><b>${t}</b><button id="mt" style="padding:4px 8px">${mute?"🔇":"🔊"}</button></div>`}
+function wire(){$("#bk").onclick=()=>{clearInterval(TM);home()};$("#mt").onclick=()=>{mute=!mute;$("#mt").textContent=mute?"🔇":"🔊"}}
+function end(title,line,again){clearInterval(TM);sfx("win");confetti();$("#app").innerHTML=`<h1 class="rainbow">${title}</h1><div class="card" style="text-align:center"><p>${line}</p></div><button class="big" id="ag">↻ PLAY AGAIN</button><button id="bk" style="width:100%;margin-top:10px">← Menu</button>`;$("#ag").onclick=again;$("#bk").onclick=home}
+
+function memory(){
+ const n=[6,8,10][T],ws=shuf(WORDS[T].concat(WORDS[(T+1)%3])).slice(0,n),cs=shuf(ws.flatMap(([w,e])=>[{k:w,t:e},{k:w,t:w}]));
+ let op=[],lock=false,mv=0,f=0;
+ $("#app").innerHTML=head("🧠 Memory Match")+`<p class="msg">Match each picture with its word! Moves: <b id="mv">0</b></p><div class="grid mem" id="mg">${cs.map((c,i)=>`<button class="mc" data-i="${i}">?</button>`).join("")}</div>`;
+ wire();
+ $("#mg").onclick=e=>{const b=e.target.closest(".mc");if(!b||lock||b.classList.contains("up"))return;const c=cs[+b.dataset.i];b.textContent=c.t;b.style.fontSize=c.t===c.k?"16px":"34px";b.classList.add("up");op.push(b);sfx("ok");
+  if(op.length<2)return;mv++;$("#mv").textContent=mv;const[a,d]=op;op=[];
+  if(cs[+a.dataset.i].k===cs[+d.dataset.i].k){a.classList.add("done");d.classList.add("done");burst(d.getBoundingClientRect(),["⭐","✨"]);if(++f==n)setTimeout(()=>end("🧠 Memory Master!",`You matched all ${n} pairs in ${mv} moves!`,memory),700)}
+  else{lock=true;sfx("no");setTimeout(()=>{[a,d].forEach(x=>{x.classList.remove("up");x.textContent="?";x.style.fontSize=""});lock=false},900)}}}
+
+function builder(){
+ const ws=shuf(WORDS[T]).slice(0,5);let r=0,sc=0;
+ const round=()=>{const[w,e]=ws[r];let tl=shuf(w.split(""));for(let k=0;k<20&&tl.join("")===w;k++)tl=shuf(tl);let u=[],bad=0;
+  const draw=()=>{$("#app").innerHTML=head("🔤 Word Builder")+`<div class="bar"><i style="width:${r*20}%"></i></div><div class="q" style="font-size:80px;margin:10px 0">${e}</div><div class="slots">${w.split("").map((_,i)=>`<span class="slot">${u[i]!=null?tl[u[i]]:""}</span>`).join("")}</div><div class="row" id="tl">${tl.map((l,i)=>`<button data-i="${i}" ${u.includes(i)?"disabled":""}>${l}</button>`).join("")}</div><div class="row" style="margin-top:12px"><button id="un">⌫ Undo</button></div><p class="msg">Word ${r+1} of 5</p>`;
+   wire();$("#un").onclick=()=>{u.pop();draw()};
+   $("#tl").onclick=ev=>{const b=ev.target.closest("button");if(!b||b.disabled)return;u.push(+b.dataset.i);sfx("ok");draw();if(u.length<w.length)return;
+    if(u.map(j=>tl[j]).join("")===w){if(!bad)sc++;sfx("build");document.querySelectorAll(".slot").forEach(s=>s.style.background="#a5d6a7");setTimeout(()=>{r++;r<5?round():end("🔤 Spelling Star!",`You spelled ${sc} of 5 words on the first try!`,builder)},800)}
+    else{bad=1;sfx("no");document.querySelector(".slots").classList.add("shake");setTimeout(()=>{u=[];draw()},700)}}};
+  draw()};
+ round()}
+
+function rocket(){
+ clearInterval(TM);let t=45,n=0,lock=false;
+ TM=setInterval(()=>{t--;const el=$("#tm");if(el)el.textContent=t;if(t<=0)end("⏰ Time’s up!",`You collected ${n} of 10 stars. Try again!`,rocket)},1000);
+ const ask=()=>{const q=qMath(T);lock=false;
+  $("#app").innerHTML=head("🚀 Rocket Maths")+`<div class="card"><div class="top"><span>⏱️ <b id="tm">${t}</b>s</span><span>⭐ ${n}/10</span></div><div class="track"><span class="rk" style="left:${n*9}%">🚀</span><span class="mn">🌕</span></div></div><div class="card"><div class="q">${q.q}</div><div class="opts">${q.o.map(o=>`<button>${o}</button>`).join("")}</div></div>`;
+  wire();
+  $(".opts").onclick=e=>{const b=e.target.closest("button");if(!b||lock)return;lock=true;
+   if(b.textContent===q.a){n++;sfx("ok");burst(b.getBoundingClientRect(),["⭐","✨"]);if(n>=10){clearInterval(TM);return setTimeout(()=>end("🚀 Moon landing!",`You reached the moon with ${t} seconds left!`,rocket),500)}setTimeout(ask,400)}
+   else{sfx("no");b.classList.add("no");t=Math.max(1,t-3);setTimeout(ask,700)}}};
+ ask()}
+
+const GAMES=[{n:"Block Quest",i:"⛏️",d:"Mine blocks, build a castle",c:"#a5d6a7",f:start},{n:"Memory Match",i:"🧠",d:"Match pictures to words",c:"#ffd54f",f:memory},{n:"Word Builder",i:"🔤",d:"Unscramble the letters",c:"#81d4fa",f:builder},{n:"Rocket Maths",i:"🚀",d:"Race the clock to the moon",c:"#ff8a80",f:rocket}];
+function home(){
+ clearInterval(TM);
+ $("#app").innerHTML=`<h1 class="rainbow">🎮 GAME ARCADE 🎮</h1><p style="text-align:center">Pick your level, then pick a game!</p><div class="card"><div class="row" id="lv">${LV.map((l,i)=>`<button data-i="${i}" class="${i==T?"on":""}">${l}</button>`).join("")}</div></div><div class="games">${GAMES.map((g,i)=>`<button class="gc" data-i="${i}" style="background:${g.c}"><span>${g.i}</span><b>${g.n}</b><small>${g.d}</small></button>`).join("")}</div>`;
+ $("#lv").onclick=e=>{const b=e.target.closest("button");if(!b)return;T=+b.dataset.i;[...$("#lv").children].forEach(x=>x.classList.toggle("on",x===b))};
+ document.querySelector(".games").onclick=e=>{const b=e.target.closest(".gc");if(b){sfx("ok");GAMES[+b.dataset.i].f()}};
+}
+home();
+</script></body></html>
